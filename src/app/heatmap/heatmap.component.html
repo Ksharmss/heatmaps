@@ -1,0 +1,9 @@
+<div class="heatmap-container">
+    <div *ngFor="let row of processedData" class="heatmap-row">
+      <div *ngFor="let cell of row" 
+           class="heatmap-cell" 
+           [ngStyle]="{'background-color': getColor(cell.frequency)}">
+        {{ cell.frequency }}
+      </div>
+    </div>
+  </div>
