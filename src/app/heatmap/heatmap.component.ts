@@ -16,7 +16,7 @@ interface TimeSlot {
 })
 export class HeatmapComponent implements OnInit, OnChanges {
   @Input() data: EventData[] = [];
-  processedData: TimeSlot[][] = [];
+  processedData: { month: string, days: TimeSlot[] }[] = [];
 
   constructor(private eventDataService: EventDataService) {}
 
@@ -34,6 +34,7 @@ export class HeatmapComponent implements OnInit, OnChanges {
 
   processData() {
     const timeSlotMap = new Map<string, number>();
+
     this.data.forEach(event => {
       const timeSlot = this.getTimeSlot(event.timestamp);
       const frequency = timeSlotMap.get(timeSlot) || 0;
@@ -44,31 +45,35 @@ export class HeatmapComponent implements OnInit, OnChanges {
   }
 
   getTimeSlot(timestamp: string): string {
-    const date = new Date(timestamp);
-    return date.toISOString().slice(0, 13); // Example: '2024-07-24T12'
+    return timestamp.slice(0, 10); // Extract 'YYYY-MM-DD' for day-based grouping
   }
 
-  mapToGrid(timeSlotMap: Map<string, number>): TimeSlot[][] {
-    const grid: TimeSlot[][] = [];
-    const grouped = new Map<string, TimeSlot[]>();
+  mapToGrid(timeSlotMap: Map<string, number>): { month: string, days: TimeSlot[] }[] {
+    const groupedByMonth = new Map<string, TimeSlot[]>();
 
     timeSlotMap.forEach((frequency, time) => {
-      const day = time.slice(0, 10); // Extract the date part (e.g., '2024-07-24')
-      if (!grouped.has(day)) {
-        grouped.set(day, []);
+      const month = time.slice(0, 7); // Extract 'YYYY-MM' for month grouping
+      const day = time.slice(8, 10); // Extract 'DD' for day part
+
+      if (!groupedByMonth.has(month)) {
+        groupedByMonth.set(month, []);
       }
-      grouped.get(day)?.push({ time, frequency });
+
+      groupedByMonth.get(month)?.push({ time, frequency });
     });
 
-    grouped.forEach((slots, day) => {
-      grid.push(slots);
-    });
+    // Convert map to an array
+    const result = Array.from(groupedByMonth.entries()).map(([month, days]) => ({
+      month,
+      days: days.sort((a, b) => a.time.localeCompare(b.time)) // Sort days within each month
+    }));
 
-    return grid;
+    return result;
   }
 
   getColor(frequency: number): string {
-    const ratio = frequency / 100; // Assuming 100 is max frequency
+    const maxFrequency = 100; // Assuming a maximum frequency for scale
+    const ratio = frequency / maxFrequency;
     return `rgba(255, 0, 0, ${ratio})`;
   }
 }

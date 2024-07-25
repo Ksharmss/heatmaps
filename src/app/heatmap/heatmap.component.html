@@ -1,9 +1,12 @@
 <div class="heatmap-container">
-    <div *ngFor="let row of processedData" class="heatmap-row">
-      <div *ngFor="let cell of row" 
-           class="heatmap-cell" 
-           [ngStyle]="{'background-color': getColor(cell.frequency)}">
-        {{ cell.frequency }}
+    <div *ngFor="let monthData of processedData" class="heatmap-month">
+      <div class="month-label">{{ monthData.month }}</div>
+      <div class="heatmap-row">
+        <div *ngFor="let cell of monthData.days" 
+             class="heatmap-cell" 
+             [ngStyle]="{'background-color': getColor(cell.frequency)}">
+          {{ cell.time.slice(-2) }} <!-- Displaying day of the month -->
+        </div>
       </div>
     </div>
   </div>

@@ -27,10 +27,10 @@ export class AppComponent implements OnInit {
 
   generateInitialData(): EventData[] {
     const initialData: EventData[] = [];
-    const startTime = new Date('2024-07-24T00:00:00').getTime();
+    const startTime = new Date('2024-01-01T00:00:00').getTime();
     const endTime = new Date('2024-07-25T00:00:00').getTime();
 
-    for (let time = startTime; time < endTime; time += 3600000) {
+    for (let time = startTime; time < endTime; time += 86400000) { // Increment by day
       initialData.push({ timestamp: new Date(time).toISOString(), intensity: Math.floor(Math.random() * 100) });
     }
 
@@ -38,9 +38,8 @@ export class AppComponent implements OnInit {
   }
 
   generateRandomEvent(): EventData {
-    const randomTime = new Date(new Date().getTime() - Math.floor(Math.random() * 3600000)).toISOString();
+    const randomTime = new Date(new Date().getTime() - Math.floor(Math.random() * 86400000)).toISOString();
     const randomIntensity = Math.floor(Math.random() * 100);
     return { timestamp: randomTime, intensity: randomIntensity };
   }
 }
-
